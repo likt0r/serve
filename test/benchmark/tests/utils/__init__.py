@@ -21,12 +21,14 @@ S3_BUCKET_BENCHMARK_ARTIFACTS = "s3://torchserve-model-serving/benchmark_artifac
 
 DEFAULT_DOCKER_DEV_ECR_REPO = "torchserve-benchmark"
 DEFAULT_DOCKER_DEV_ECR_TAG = "dev-image"
-DEFAULT_DOCKER_DEV_ECR_REPO_TAG = f"{DEFAULT_DOCKER_DEV_ECR_REPO}:{DEFAULT_DOCKER_DEV_ECR_TAG}"
+DEFAULT_DOCKER_DEV_ECR_REPO_TAG = (
+    f"{DEFAULT_DOCKER_DEV_ECR_REPO}:{DEFAULT_DOCKER_DEV_ECR_TAG}"
+)
 ECR_REPOSITORY_URL = "{}.dkr.ecr.{}.amazonaws.com/{}"
 
 GPU_INSTANCES = ["p2", "p3", "p4", "g2", "g3", "g4"]
 
-# DLAMI with nVidia Driver ver. 450.119.03 (support upto CUDA 11.2), Ubuntu 18.04
+# DLAMI with nVidia Driver ver. 450.119.03 (support upto CUDA 11.2), Ubuntu 20.04
 AMI_ID = "ami-0ff137c06803a8bb7"
 # AMI_ID = "ami-0198925303105158c", with apache2-utils installed
 
@@ -45,7 +47,9 @@ class DockerImageHandler(object):
         """
         Uses the start_build.sh script to build a docker container with the given parameters.
         """
-        torch_serve_docker_directory = os.path.abspath(os.path.join(__file__, "../../../../../docker/"))
+        torch_serve_docker_directory = os.path.abspath(
+            os.path.join(__file__, "../../../../../docker/")
+        )
         current_working_directory = os.getcwd()
         os.chdir(torch_serve_docker_directory)
         if self.cuda_version:
@@ -53,15 +57,22 @@ class DockerImageHandler(object):
                 f"./build_image.sh -bt dev -g -cv {self.cuda_version} -t {DEFAULT_DOCKER_DEV_ECR_REPO}:{self.docker_tag}"
             )
         else:
-            run_out = run(f"./build_image.sh -bt dev -t {DEFAULT_DOCKER_DEV_ECR_REPO}:{self.docker_tag}")
+            run_out = run(
+                f"./build_image.sh -bt dev -t {DEFAULT_DOCKER_DEV_ECR_REPO}:{self.docker_tag}"
+            )
 
         # Switch back to original directory
         os.chdir(current_working_directory)
-        LOGGER.info(f"Dev image build successful:  {DEFAULT_DOCKER_DEV_ECR_REPO}:{self.docker_tag}")
+        LOGGER.info(
+            f"Dev image build successful:  {DEFAULT_DOCKER_DEV_ECR_REPO}:{self.docker_tag}"
+        )
 
     @staticmethod
     def push_docker_image_to_ecr(
-        account_id, region, docker_repo_tag=f"{DEFAULT_DOCKER_DEV_ECR_REPO_TAG}", connection=None
+        account_id,
+        region,
+        docker_repo_tag=f"{DEFAULT_DOCKER_DEV_ECR_REPO_TAG}",
+        connection=None,
     ):
         """
         :param account_id: aws account id to which the dev image must be pushed
@@ -80,7 +91,9 @@ class DockerImageHandler(object):
             run_out = connection.run(ecr_login_command)
         else:
             run_out = run(ecr_login_command)
-        assert run_out.return_code == 0, f"ECR login failed when pushing dev image to ECR"
+        assert (
+            run_out.return_code == 0
+        ), f"ECR login failed when pushing dev image to ECR"
 
         if connection:
             run_out = connection.run(f"docker push {ecr_uri}")
@@ -93,7 +106,10 @@ class DockerImageHandler(object):
 
     @staticmethod
     def pull_docker_image_from_ecr(
-        account_id, region, docker_repo_tag=f"{DEFAULT_DOCKER_DEV_ECR_REPO_TAG}", connection=None
+        account_id,
+        region,
+        docker_repo_tag=f"{DEFAULT_DOCKER_DEV_ECR_REPO_TAG}",
+        connection=None,
     ):
         """
         :param account_id: aws account id from which the dev image must be pulled
@@ -109,7 +125,9 @@ class DockerImageHandler(object):
             run_out = connection.run(ecr_login_command)
         else:
             run_out = run(ecr_login_command)
-        assert run_out.return_code == 0, f"ECR login failed when pushing dev image to ECR"
+        assert (
+            run_out.return_code == 0
+        ), f"ECR login failed when pushing dev image to ECR"
 
         if connection:
             run_out = connection.run(f"docker pull {ecr_uri}")
@@ -160,7 +178,9 @@ class YamlHandler(object):
 
     optional_docker_config_keys = ["cuda_version"]
 
-    valid_docker_config_keys = mandatory_docker_config_keys + optional_docker_config_keys
+    valid_docker_config_keys = (
+        mandatory_docker_config_keys + optional_docker_config_keys
+    )
 
     @staticmethod
     def load_yaml(file_path):
@@ -208,18 +228,23 @@ class YamlHandler(object):
                     type(batch_size_list[0]) == list
                 ), f"Batch sizes should be part of a list. Check config for '{mode}' under model '{model}'."
 
-                invalid_config_keys = set(config_list).difference(YamlHandler.valid_config_keys)
+                invalid_config_keys = set(config_list).difference(
+                    YamlHandler.valid_config_keys
+                )
                 assert (
                     len(invalid_config_keys) == 0
                 ), f"Invalid key(s) detected: {invalid_config_keys}. Config keys must be either of {YamlHandler.valid_config_keys}. Check config for '{mode}' under model '{model}'."
 
-                missing_config_keys = set(YamlHandler.mandatory_config_keys).difference(config_list)
+                missing_config_keys = set(YamlHandler.mandatory_config_keys).difference(
+                    config_list
+                )
                 assert (
                     len(missing_config_keys) == 0
                 ), f"Config key(s) missing: {missing_config_keys}. All of the following keys are required: {YamlHandler.mandatory_config_keys}. Check config for '{mode}' under model '{model}'."
 
                 assert not all(
-                    key in config_list for key in YamlHandler.mutually_exclusive_docker_config_keys
+                    key in config_list
+                    for key in YamlHandler.mutually_exclusive_docker_config_keys
                 ), f"Either of the keys {YamlHandler.mutually_exclusive_docker_config_keys} maybe present in config, but not both. Check config for '{mode}' under model '{model}'."
 
                 config_list.clear()
@@ -251,12 +276,16 @@ class YamlHandler(object):
             for config_key, config_value in docker_config.items():
                 docker_config_list.append(config_key)
 
-            invalid_config_keys = set(docker_config_list).difference(YamlHandler.valid_docker_config_keys)
+            invalid_config_keys = set(docker_config_list).difference(
+                YamlHandler.valid_docker_config_keys
+            )
             assert (
                 len(invalid_config_keys) == 0
             ), f"Invalid config key(s) detected: {invalid_config_keys}. Config keys must be either of {YamlHandler.valid_docker_config_keys}. Check config for '{processor}''."
 
-            missing_config_keys = set(YamlHandler.mandatory_docker_config_keys).difference(docker_config_list)
+            missing_config_keys = set(
+                YamlHandler.mandatory_docker_config_keys
+            ).difference(docker_config_list)
             assert (
                 len(missing_config_keys) == 0
             ), f"Config key(s) missing: {missing_config_keys}. All of the following keys are required: {YamlHandler.mandatory_docker_config_keys}. Check config for '{processor}'."
@@ -266,7 +295,9 @@ class YamlHandler(object):
                     "cuda_version" in docker_config_list
                 ), f"cuda_version missing under processor 'gpu'. cuda_version must be of format cuXYZ e.g.cu102, cu111 etc."
 
-        invalid_processor_keys = set(processor_list).difference(YamlHandler.valid_docker_processors)
+        invalid_processor_keys = set(processor_list).difference(
+            YamlHandler.valid_docker_processors
+        )
         assert (
             len(invalid_processor_keys) == 0
         ), f"Invalid processor key found, must be either of {YamlHandler.valid_docker_processors}"

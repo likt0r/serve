@@ -2,10 +2,10 @@
 
 MACHINE=cpu
 BRANCH_NAME="master"
-DOCKER_TAG="pytorch/torchserve:latest-cpu"
+DOCKER_TAG="bewr42/torchserve:latest-cpu"
 BUILD_TYPE="production"
 DOCKER_FILE="Dockerfile"
-BASE_IMAGE="ubuntu:18.04"
+BASE_IMAGE="ubuntu:20.04"
 CUSTOM_TAG=false
 CUDA_VERSION=""
 
@@ -35,8 +35,8 @@ do
           ;;
         -g|--gpu)
           MACHINE=gpu
-          DOCKER_TAG="pytorch/torchserve:latest-gpu"
-          BASE_IMAGE="nvidia/cuda:10.2-cudnn7-runtime-ubuntu18.04"
+          DOCKER_TAG="bewr42/torchserve:latest-gpu"
+          BASE_IMAGE="nvidia/cuda:11.4.0-runtime-ubuntu20.04"
           CUDA_VERSION="cu102"
           shift
           ;;
@@ -53,18 +53,27 @@ do
           ;;
         -cv|--cudaversion)
           CUDA_VERSION="$2"
-          if [ $CUDA_VERSION == "cu111" ];
+          if [ $CUDA_VERSION == "cu114" ];
           then
-            BASE_IMAGE="nvidia/cuda:11.1-cudnn8-runtime-ubuntu18.04"
-          elif [ $CUDA_VERSION == "cu102" ];
+            BASE_IMAGE="nvidia/cuda:11.4.0-runtime-ubuntu20.04"
+          elif [ $CUDA_VERSION == "cu113" ]
           then
-            BASE_IMAGE="nvidia/cuda:10.2-cudnn7-runtime-ubuntu18.04"
+            BASE_IMAGE="nvidia/cuda:11.3.0-runtime-ubuntu20.04"
           elif [ $CUDA_VERSION == "cu101" ]
           then
-            BASE_IMAGE="nvidia/cuda:10.1-cudnn7-runtime-ubuntu18.04"
+            BASE_IMAGE="nvidia/cuda:11.2-cudnn7-runtime-ubuntu20.04"
+          elif [ $CUDA_VERSION == "cu102" ];
+          then
+            BASE_IMAGE="nvidia/cuda:11.1-cudnn7-runtime-ubuntu20.04"
+          elif [ $CUDA_VERSION == "cu101" ];
+          then
+            BASE_IMAGE="nvidia/cuda:10.2-cudnn7-runtime-ubuntu20.04"
+          elif [ $CUDA_VERSION == "cu101" ]
+          then
+            BASE_IMAGE="nvidia/cuda:10.1-cudnn7-runtime-ubuntu20.04"
           elif [ $CUDA_VERSION == "cu92" ];
           then
-            BASE_IMAGE="nvidia/cuda:9.2-cudnn7-runtime-ubuntu18.04"
+            BASE_IMAGE="nvidia/cuda:9.2-cudnn7-runtime-ubuntu20.04"
           else
             echo "CUDA version not supported"
             exit 1
@@ -77,12 +86,12 @@ done
 
 if [ "${BUILD_TYPE}" == "dev" ] && ! $CUSTOM_TAG ;
 then
-  DOCKER_TAG="pytorch/torchserve:dev-$MACHINE"
+  DOCKER_TAG="bewr42/torchserve:dev-$MACHINE"
 fi
 
 if [ "${BUILD_TYPE}" == "codebuild" ] && ! $CUSTOM_TAG ;
 then
-  DOCKER_TAG="pytorch/torchserve:codebuild-$MACHINE"
+  DOCKER_TAG="bewr42/torchserve:codebuild-$MACHINE"
 fi
 
 if [ $BUILD_TYPE == "production" ]

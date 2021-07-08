@@ -11,7 +11,7 @@
   * Create a PersistentVolume backed by EFS to store models and config
   * Use Helm charts to deploy Torchserve
 
-  All these steps scripts are written for AWS EKS with Ubuntu 18.04 for deployment, but could be easily adopted for Kubernetes offering from other vendors.
+  All these steps scripts are written for AWS EKS with Ubuntu 20.04 for deployment, but could be easily adopted for Kubernetes offering from other vendors.
 
   ## Prerequisites
 
@@ -544,18 +544,18 @@
   
   The following table describes all the parameters for the Helm Chart.
 
-  | Parameter          | Description              | Default                         |
-  | ------------------ | ------------------------ | ------------------------------- |
-  | `image`            | Torchserve Serving image | `pytorch/torchserve:latest-gpu` |
-  | `management-port`  | TS Inference port        | `8080`                          |
-  | `inference-port`   | TS Management port       | `8081`                          |
-  | `replicas`         | K8S deployment replicas  | `1`                             |
-  | `model-store`      | EFS mountpath            | `/home/model-server/shared/`    |
-  | `persistence.size` | Storage size to request  | `1Gi`                           |
-  | `n_gpu`            | Number of GPU in a TS Pod| `1`                             |
-  | `n_cpu`            | Number of CPU in a TS Pod| `1`                             |
-  | `memory_limit`     | TS Pod memory limit      | `4Gi`                           |
-  | `memory_request`   | TS Pod memory request    | `1Gi`                           |
+  | Parameter          | Description               | Default                         |
+  | ------------------ | ------------------------- | ------------------------------- |
+  | `image`            | Torchserve Serving image  | `pytorch/torchserve:latest-gpu` |
+  | `management-port`  | TS Inference port         | `8080`                          |
+  | `inference-port`   | TS Management port        | `8081`                          |
+  | `replicas`         | K8S deployment replicas   | `1`                             |
+  | `model-store`      | EFS mountpath             | `/home/model-server/shared/`    |
+  | `persistence.size` | Storage size to request   | `1Gi`                           |
+  | `n_gpu`            | Number of GPU in a TS Pod | `1`                             |
+  | `n_cpu`            | Number of CPU in a TS Pod | `1`                             |
+  | `memory_limit`     | TS Pod memory limit       | `4Gi`                           |
+  | `memory_request`   | TS Pod memory request     | `1Gi`                           |
 
 
   Edit the values in `values.yaml` with the right parameters.  Somethings to consider,

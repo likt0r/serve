@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: >-
   AWS CloudFormation TorchServe: Creates a TorchServe stack using
-  an EC2 autoscaling group running Ubuntu 18.04 behind an Elastic Load Balancer,
+  an EC2 autoscaling group running Ubuntu 20.04 behind an Elastic Load Balancer,
   installss the packages and files necessary to deploy.
   Additionally, creates a CPUUtilization based scale up/down policy as an example.
   **WARNING** This template creates an Amazon EC2 instance. You will be billed for
