@@ -34,6 +34,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
     python3-distutils \
     python3.9-venv \
     openjdk-11-jre-headless \
+    libsndfile1-dev \
     curl \
     && rm -rf /var/lib/apt/lists/* \
     && cd /tmp \
@@ -67,7 +68,9 @@ RUN TORCH_VER=$(curl --silent --location https://pypi.org/pypi/torch/json | pyth
     pip install --no-cache-dir torch==$TORCH_VER+cpu torchvision==$TORCH_VISION_VER+cpu -f https://download.pytorch.org/whl/torch_stable.html; \
     fi
 RUN pip install --no-cache-dir captum torchtext torchserve torch-model-archiver
-
+RUN pip install --no-cache-dir librosa
+RUN pip install --no-cache-dir sndfile
+RUN pip install --no-cache-dir yaml
 # Final image for production
 FROM ${BASE_IMAGE} AS runtime-image
 
@@ -83,6 +86,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
     python3.9-dev \
     openjdk-11-jre-headless \
     build-essential \
+    libsndfile1 \
     && rm -rf /var/lib/apt/lists/* \
     && cd /tmp
 
