@@ -70,7 +70,7 @@ RUN TORCH_VER=$(curl --silent --location https://pypi.org/pypi/torch/json | pyth
 RUN pip install --no-cache-dir captum torchtext torchserve torch-model-archiver
 RUN pip install --no-cache-dir librosa
 RUN pip install --no-cache-dir sndfile
-RUN pip install --no-cache-dir yaml
+RUN pip install --no-cache-dir PyYAML
 # Final image for production
 FROM ${BASE_IMAGE} AS runtime-image
 
